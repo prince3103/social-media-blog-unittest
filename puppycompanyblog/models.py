@@ -1,7 +1,12 @@
 from puppycompanyblog import db,login_manager
 from datetime import datetime
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
+from flask_admin.contrib.sqla import ModelView
+from flask_admin import AdminIndexView
+from flask_admin.menu import MenuLink
+from flask import redirect, url_for
+
 
 
 # The user_loader decorator allows flask-login to load the current user
@@ -21,6 +26,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
+    role = db.Column(db.String(120), nullable = False)
     # This connects BlogPosts to a User Author.
     posts = db.relationship('BlogPost', backref='author', lazy=True)
 
@@ -28,6 +34,11 @@ class User(db.Model, UserMixin):
         self.email = email
         self.username = username
         self.password_hash = generate_password_hash(password)
+
+        if User.query.all()==[]:
+            self.role = 'admin'
+        else:
+            self.role ='user'
 
     def check_password(self,password):
         return check_password_hash(self.password_hash,password)
@@ -55,3 +66,36 @@ class BlogPost(db.Model):
 
     def __repr__(self):
         return f"Post Id: {self.id} --- Date: {self.date} --- Title: {self.title}"
+
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            # fresh_login()
+            return current_user.role=='admin'
+        else: 
+            return False
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('admins.admin_login'))
+
+
+class MyAdminIndexView(AdminIndexView):
+    
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            return current_user.role=='admin'
+        else: 
+            return False
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('admins.admin_login'))
+
+# class LoginMenuLink(MenuLink):
+
+#     def is_accessible(self):
+#         return not current_user.is_authenticated 
+
+
+class LogoutMenuLink(MenuLink):
+
+    def is_accessible(self):
+        return current_user.is_authenticated  

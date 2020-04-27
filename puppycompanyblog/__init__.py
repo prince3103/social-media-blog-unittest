@@ -3,7 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-
+from flask_admin import Admin
 
 
 
@@ -40,6 +40,16 @@ login_manager.init_app(app)
 # Tell users what view to go to when they need to login.
 login_manager.login_view = "users.login"
 
+###########################
+#### Admin CONFIGS #######
+#########################
+
+from puppycompanyblog.models import MyAdminIndexView, User, MyModelView, LogoutMenuLink, BlogPost
+admin = Admin(app, name='Admin', template_mode='bootstrap3', index_view = MyAdminIndexView())
+admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(BlogPost, db.session))
+# # admin.add_link(LoginMenuLink(name='Login', category='', url="admins.admin_login"))
+admin.add_link(LogoutMenuLink(name='Logout', category='', url="/admin_logout"))
 
 ###########################
 #### BLUEPRINT CONFIGS #######
@@ -48,9 +58,11 @@ from puppycompanyblog.core.views import core
 from puppycompanyblog.users.views import users
 from puppycompanyblog.blog_posts.views import blog_posts
 from puppycompanyblog.error_pages.handlers import error_pages
+from puppycompanyblog.admins.views import admins
 
 # Register the apps
 app.register_blueprint(users)
 app.register_blueprint(blog_posts)
 app.register_blueprint(core)
 app.register_blueprint(error_pages)
+app.register_blueprint(admins)
