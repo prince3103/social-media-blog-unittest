@@ -20,7 +20,7 @@ def admin_login():
 			flash('Logged in successfully.')
 			return redirect("/admin")
 		else:
-			flash('Invalid email address or password')
+			flash('Invalid Email Address or Password')
 	return render_template('admin_login.html', form = form)
 
 
