@@ -10,7 +10,7 @@ admins = Blueprint('admins', __name__)
 def admin_login():
 
 	if current_user.is_authenticated:
-		return redirect(url_for('admins.admin_logout'))
+		logout_user()
 	form = AdminLoginForm()
 	if form.validate_on_submit():
 		email = request.form['email']

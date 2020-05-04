@@ -8,6 +8,9 @@
 		    	{% if message == 'Thanks for registering! Now you can login!' %}
 		      		<li>{{ message }}</li>
 	      		{% endif %}
+      			{% if message == 'This field is required.' %}
+		      		{{ message }}
+		      	{% endif %}
 		    {% endfor %}
 		    </ul>
 		  {% endif %}

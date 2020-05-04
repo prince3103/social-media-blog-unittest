@@ -16,6 +16,9 @@
 			    	{% if message == 'Your email has been registered already!' %}
 			      		<li>{{ message }}</li>
 			      	{% endif %}
+			      	{% if message == 'This field is required.' %}
+			      		{{ message }}
+			      	{% endif %}
 			    {% endfor %}
 			    </ul>
 			  {% endif %}
@@ -39,12 +42,22 @@
     	</div>
     	<div class="form-group">
 	    	{{ form.pass_confirm.label }} {{ form.pass_confirm(type="password", class="form-control", placeholder="Confirm Password", required="required") }}
+
+	    	{% if messages %}
+			    <ul class="flashes">
+			    {% for message in messages %}
+			    	{% if message == 'Passwords Must Match!' %}
+			      		<li>{{ message }}</li>
+		      		{% endif %}
+			    {% endfor %}
+			    </ul>
+			  {% endif %}
     	</div>
     	<div class="form-group">
 	    	{{ form.submit(type="submit", class="btn btn-primary btn-block") }}
     	</div>
 	</form>
-	<div class="text-center">Already have an account? <a href="{{ url_for('users.login') }}">Sign in</a></div>
+	<div class="text-center">Already have an account? <a href="{{ url_for('users.login') }}">Log in</a></div>
 	{% endwith %}
 </div>
 

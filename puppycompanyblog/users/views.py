@@ -11,8 +11,9 @@ users = Blueprint('users', __name__)
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        logout_user()
     form = RegistrationForm()
-
     if form.validate_on_submit():
         check_email = form.check_email(form.email)
         check_username = form.check_username(form.username)
@@ -26,11 +27,16 @@ def register():
             db.session.commit()
             flash('Thanks for registering! Now you can login!')
             return redirect(url_for('users.login'))
+    elif request.method == 'POST':
+        for key in form.errors.keys():
+            flash(form.errors[key][0])
+            print(form.errors[key][0])
     return render_template('register.html', form=form)
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
-
+    if current_user.is_authenticated:
+        logout_user()
     form = LoginForm()
     if form.validate_on_submit():
         # Grab the user from our User Models table
@@ -58,6 +64,10 @@ def login():
             return redirect(next)
         else:
             flash('Invalid Email Address or Password')
+    elif request.method == 'POST':
+        validate_error=""
+        for key in form.errors.keys():
+            flash(form.errors[key][0])
     return render_template('login.html', form=form)
 
 
